@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { UploadModule } from './upload/upload.module';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -11,7 +13,15 @@ import { SequelizeModule } from '@nestjs/sequelize';
       synchronize: true,
       autoLoadModels: true,
       models: [__dirname + '/**/*.model.ts'],
-    })
+    }),
+    BullModule.forRoot({
+      redis: {
+        host: 'localhost',
+        port: 6379,
+        password: 'redis'
+      },
+    }),
+    UploadModule
   ],
   controllers: [AppController],
   providers: [AppService],
