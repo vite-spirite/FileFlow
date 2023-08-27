@@ -1,0 +1,31 @@
+version: '3.5'
+
+services:
+  backend:
+    build: ./backend
+    container_name: backend
+    restart: always
+    ports:
+      - 3000:3000
+    volumes:
+      - ./backend:/app
+    networks:
+      - FileFlow
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: always
+    ports:
+      - 6379:6379
+    networks:
+      - FileFlow
+    command: redis-server --requirepass redis --save 20 1 --loglevel warning
+    volumes:
+      - redis:/data
+
+networks:
+  FileFlow:
+    driver: bridge
+
+volumes:
+  redis:
