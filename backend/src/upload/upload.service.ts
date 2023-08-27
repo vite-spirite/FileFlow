@@ -7,6 +7,7 @@ import { File } from './models/file.model';
 import { CreateFileDto } from './dto/create-file.dto';
 import { createReadStream, readFileSync } from 'fs';
 import { createDecipheriv } from 'crypto';
+import jszip from 'jszip';
 
 @Injectable()
 export class UploadService {

@@ -29,9 +29,10 @@ export class ZipperProcessor {
 
         const zipName = this.nanoid(32)+'.zip';
 
-        const content = await zip.generateAsync({type: "nodebuffer"});
+        const content = await zip.generateAsync({type: "nodebuffer", compression: "DEFLATE", compressionOptions: {level: 9}});
         mkdirSync('./uploads/zipper', {recursive: true});
         writeFileSync('./uploads/zipper/'+zipName, content);
+
 
         files.forEach(file => {
             rmSync(file.path);
