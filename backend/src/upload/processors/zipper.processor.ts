@@ -3,12 +3,16 @@ import { Job } from "bull";
 import { UploadService } from "../upload.service";
 import * as JSZip from "jszip";
 import { mkdir, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from "fs";
-import { nanoid } from "nanoid";
+import { customAlphabet } from "nanoid";
 
 @Processor('zipper')
 export class ZipperProcessor {
 
-    constructor(private uploadFileService: UploadService) {}
+    private nanoid: (size?: number) => string;
+
+    constructor(private uploadFileService: UploadService) {
+        this.nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', 32);
+    }
 
     @Process('zipper')
     async zipper(job: Job<{files: Express.Multer.File[]}>) {
@@ -23,7 +27,7 @@ export class ZipperProcessor {
         });
 
 
-        const zipName = nanoid(32)+'.zip';
+        const zipName = this.nanoid(32)+'.zip';
 
         const content = await zip.generateAsync({type: "nodebuffer"});
         mkdirSync('./uploads/zipper', {recursive: true});
