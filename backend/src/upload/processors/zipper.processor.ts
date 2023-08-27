@@ -15,7 +15,7 @@ export class ZipperProcessor {
     }
 
     @Process('zipper')
-    async zipper(job: Job<{files: Express.Multer.File[]}>) {
+    async zipper(job: Job<{files: Express.Multer.File[], id: number}>) {
         console.log("Start")
         const {files} = job.data;
 
@@ -38,12 +38,11 @@ export class ZipperProcessor {
         });
 
         console.log("Done");
-        return zipName;
+        return {fileName: zipName, id: job.data.id};
     }
 
     @OnQueueCompleted()
     async onCompleted(job: Job<any>, result: any) {
-        console.log(`Completed job ${job.id} of type ${job.name}, result: ${result}`);
         await this.uploadFileService.completeZipFiles(result);
     }
 }

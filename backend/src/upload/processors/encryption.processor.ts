@@ -1,4 +1,4 @@
-import { Process, Processor } from '@nestjs/bull';
+import { OnQueueCompleted, Process, Processor } from '@nestjs/bull';
 import { UploadService } from '../upload.service';
 import { Job } from 'bull';
 import { nanoid } from 'nanoid';
@@ -11,13 +11,13 @@ export class EncryptionProcessor {
     constructor(private uploadFileService: UploadService) {}
 
     @Process('encrypt')
-    async encrypt(job: Job<string>) {
+    async encrypt(job: Job<{fileName: string, id: number}>) {
         const password = nanoid(64);
         const iv = randomBytes(16);
         const key = scryptSync(password, nanoid(12), 32);
 
         const cipher = createCipheriv('aes-256-ctr', key, iv);
-        const file = readFileSync('./uploads/zipper/'+job.data);
+        const file = readFileSync('./uploads/zipper/'+job.data.fileName);
         console.log(nanoid(12));
 
         const encrypted = Buffer.concat([cipher.update(file), cipher.final()]);
@@ -27,12 +27,18 @@ export class EncryptionProcessor {
         const filePath = './uploads/encryption/'+fileName;
         writeFileSync(filePath, Buffer.concat([iv, encrypted]));
 
-        rmSync('./uploads/zipper/'+job.data);
+        rmSync('./uploads/zipper/'+job.data.fileName);
 
         return {
+            id: job.data.id,
             fileName: fileName,
             iv: iv.toString('hex'),
             key: key.toString('hex'),
         };
+    }
+
+    @OnQueueCompleted()
+    async onCompleted(job: Job<any>, result: any) {
+        await this.uploadFileService.completeEncryption(result);
     }
 }

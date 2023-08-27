@@ -12,7 +12,6 @@ import { BullModule } from '@nestjs/bull';
       storage: 'database.sqlite',
       synchronize: true,
       autoLoadModels: true,
-      models: [__dirname + '/**/*.model.ts'],
     }),
     BullModule.forRoot({
       redis: {

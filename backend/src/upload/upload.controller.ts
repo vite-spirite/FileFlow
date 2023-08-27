@@ -1,8 +1,9 @@
-import { Controller, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { UploadService } from './upload.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { nanoid } from 'nanoid';
+import { CreateFileDto } from './dto/create-file.dto';
 
 @Controller('upload')
 export class UploadController {
@@ -21,8 +22,8 @@ export class UploadController {
       }),
     })
   )
-  async uploadFile(@UploadedFiles() files) {
-    await this.uploadService.create(files);
+  async uploadFile(@UploadedFiles() files, @Body() options: CreateFileDto) {
+    await this.uploadService.create(files, options);
     console.log(files);
   }
 }
