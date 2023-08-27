@@ -5,6 +5,8 @@ import { Queue } from 'bull';
 import { FileTo } from './models/fileTo.model';
 import { File } from './models/file.model';
 import { CreateFileDto } from './dto/create-file.dto';
+import { createReadStream, readFileSync } from 'fs';
+import { createDecipheriv } from 'crypto';
 
 @Injectable()
 export class UploadService {
@@ -49,6 +51,18 @@ export class UploadService {
         file.isEncrypted = true;
         await file.save();
 
+        console.log(`http://localhost:3000/upload/${result.fileName}/${result.key}/${result.iv}`);
         //send email to user with link to download file with password and iv in microservice
+    }
+
+    downloadFile(file: string, key: string, iv: string) {
+        const filePath = './uploads/encryption/'+file;
+
+        const decipher = createDecipheriv('aes-256-ctr', Buffer.from(key, 'hex'), Buffer.from(iv, 'hex'));
+        const stream = createReadStream(filePath);
+
+        const decrypt = stream.pipe(decipher);
+
+        return decrypt;
     }
 }

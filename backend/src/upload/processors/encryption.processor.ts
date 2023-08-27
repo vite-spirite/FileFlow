@@ -25,7 +25,7 @@ export class EncryptionProcessor {
         mkdirSync('./uploads/encryption', {recursive: true});
         const fileName = nanoid(32)+'.enc';
         const filePath = './uploads/encryption/'+fileName;
-        writeFileSync(filePath, Buffer.concat([iv, encrypted]));
+        writeFileSync(filePath, encrypted);
 
         rmSync('./uploads/zipper/'+job.data.fileName);
 
