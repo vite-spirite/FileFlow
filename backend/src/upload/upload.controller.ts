@@ -30,9 +30,9 @@ export class UploadController {
     console.log(files);
   }
 
-  @Get(':file/:key/:iv')
-  downloadFile(@Param('file') file: string, @Param('key') key: string, @Param('iv') iv: string, @Res({passthrough: true}) res: Response) {
-    const _stream = this.uploadService.downloadFile(file, key, iv);
+  @Get(':file/:token')
+  async downloadFile(@Param('file') file: string, @Param('token') token: string, @Res({passthrough: true}) res: Response) {
+    const _stream = await this.uploadService.downloadFile(file, token);
     return new StreamableFile(_stream);
   }
 }

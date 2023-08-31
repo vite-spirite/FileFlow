@@ -7,8 +7,9 @@ import { File } from './models/file.model';
 import { CreateFileDto } from './dto/create-file.dto';
 import { createReadStream, readFileSync } from 'fs';
 import { createDecipheriv } from 'crypto';
-import jszip from 'jszip';
 import { ClientProxy } from '@nestjs/microservices';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UploadService {
@@ -18,6 +19,8 @@ export class UploadService {
         @InjectQueue('zipper') private zipperQueue: Queue,
         @InjectQueue('encryption') private encryptionQueue: Queue,
         @Inject('MAILER_SERVICE') private client: ClientProxy,
+        private jwtService: JwtService,
+        private config: ConfigService
     ) {}
 
     async create(files: Express.Multer.File[], data: CreateFileDto) {
@@ -25,7 +28,7 @@ export class UploadService {
             fileName: '',
             from: data.from,
             isEncrypted: false,
-            deletedAt: new Date(Date.now() + (60 * 60 * 1000)),
+            deletedAt: new Date(new Date().setDate(new Date().getDate() + 7)),
         });
 
         data.to.forEach(async (to) => {
@@ -54,20 +57,38 @@ export class UploadService {
         file.isEncrypted = true;
         await file.save();
 
-        //send email to user with link to download file with password and iv in microservice
-
         const fileTos = await this.fileToModel.findAll({where: {fileId: result.id}});
         const targets = fileTos.map((fileTo) => fileTo.email);
-        const download = `http://localhost:3000/upload/${result.fileName}/${result.key}/${result.iv}` 
+        const download = `http://localhost:3000/upload/${result.fileName}/` 
 
-        targets.forEach((target) => {
-            this.client.emit('notify', {from: file.from, email: target, expire: file.deletedAt, download: download});
+        fileTos.forEach(async (target) => {
+            const token = this.jwtService.sign({code: target.token, key: result.key, iv: result.iv});
+            this.client.emit('notify', {from: file.from, email: target.email, expire: file.deletedAt, download: download+token});
         });
 
-        this.client.emit('confirm_upload', {email: file.from, target: targets, download: download});
+        const authorToken = this.jwtService.sign({key: result.key, iv: result.iv});
+
+        this.client.emit('confirm_upload', {email: file.from, target: targets, download: download+authorToken});
     }
 
-    downloadFile(file: string, key: string, iv: string) {
+    async downloadFile(file: string, token: string) {
+
+        const {code, key, iv} = this.jwtService.verify<{code?: string, key: string, iv: string}>(token);
+
+        if(code) {
+            const fileTo = await this.fileToModel.findOne({where: {token: code}});
+            
+            if(!fileTo) {
+                throw new Error('Invalid token');
+            }
+
+            if(!fileTo.isDownloaded) {
+                this.client.emit('file_downloaded', {email: fileTo.email, fileName: file});
+                fileTo.isDownloaded = true;
+                await fileTo.save();
+            }
+        }
+
         const filePath = './uploads/encryption/'+file;
 
         const decipher = createDecipheriv('aes-256-ctr', Buffer.from(key, 'hex'), Buffer.from(iv, 'hex'));

@@ -8,23 +8,39 @@ import { EncryptionProcessor } from './processors/encryption.processor';
 import { File } from './models/file.model';
 import { FileTo } from './models/fileTo.model';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([File, FileTo]),
     BullModule.registerQueue({name: "zipper"}, {name: "encryption"}),
-    ClientsModule.register([{
+    ClientsModule.registerAsync([{
       name: 'MAILER_SERVICE',
-      transport: Transport.RMQ,
-      options: {
-        urls: ['amqp://admin:admin@localhost:5672'],
-        queue: 'mailer_queue',
-        queueOptions: {
-          durable: false
-        },
-        
-      },
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        transport: Transport.RMQ,
+        options: {
+          urls: [config.get<string>('RABBITMQ_URL')],
+          queue: 'mailer_queue',
+          queueOptions: {
+            durable: false
+          },
+        }
+      }),
     }]),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        secret: config.get<string>('DOWNLOAD_TOKEN_SECRET'),
+        signOptions: {
+          expiresIn: '7d'
+        }
+      })
+    }),
+    ConfigModule,
   ],
   controllers: [UploadController],
   providers: [UploadService, ZipperProcessor, EncryptionProcessor],

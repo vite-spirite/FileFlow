@@ -4,21 +4,28 @@ import { AppService } from './app.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { UploadModule } from './upload/upload.module';
 import { BullModule } from '@nestjs/bull';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({isGlobal: true}),
     SequelizeModule.forRoot({
       dialect: 'sqlite',
       storage: 'database.sqlite',
       synchronize: true,
       autoLoadModels: true,
     }),
-    BullModule.forRoot({
-      redis: {
-        host: 'localhost',
-        port: 6379,
-        password: 'redis'
-      },
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        redis: {
+          host: config.get<string>('REDIS_HOST'),
+          port: config.get<number>('REDIS_PORT'),
+          password: config.get<string>('REDIS_PASSWORD'),
+          username: config.get<string>('REDIS_USERNAME'),
+        },
+      })
     }),
     UploadModule
   ],

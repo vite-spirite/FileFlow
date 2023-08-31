@@ -1,5 +1,6 @@
-import {Table, Model, Column, PrimaryKey, AutoIncrement, ForeignKey} from 'sequelize-typescript';
+import {Table, Model, Column, PrimaryKey, AutoIncrement, ForeignKey, Default, DataType} from 'sequelize-typescript';
 import {File} from './file.model';
+import { nanoid } from 'nanoid';
 
 @Table
 export class FileTo extends Model {
@@ -13,4 +14,12 @@ export class FileTo extends Model {
 
     @Column
     email: string
+
+    @Default(false)
+    @Column(DataType.BOOLEAN)
+    isDownloaded: boolean
+
+    @Default(() => nanoid(10))
+    @Column
+    token: string
 }
