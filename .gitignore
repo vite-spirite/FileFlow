@@ -1,3 +1,4 @@
 .vscode
 backend/database.sqlite
 test/
+rabitmq/
