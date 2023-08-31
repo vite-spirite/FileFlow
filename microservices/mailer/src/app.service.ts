@@ -11,21 +11,7 @@ export class AppService {
     return 'Hello World!';
   }
 
-
-  async sendMail() {
-    await this.mailer.sendMail({
-      to: 'boulangermatheo621@gmail.com',
-      from: this.config.get<string>('SMTP_USER'),
-      subject: 'Testing Nest MailerModule ✔',
-      template: 'test',
-      context: {
-        name: 'John Doe',
-        url: 'http://localhost:3000/upload/fileName/key/iv'
-      }
-    });
-  }
-
-  async sendConfirmFileSent(data: {email: string, target: string[], download: string}): Promise<void> {
+  async sendConfirmFileSent(data: {email: string, target: string[], download: string, fileName: string, expire: Date}): Promise<void> {
     await this.mailer.sendMail({
       to: data.email,
       from: this.config.get<string>('SMTP_USER'),
@@ -34,12 +20,14 @@ export class AppService {
       context: {
         target: data.target,
         name: data.email.split('@')[0],
-        download: data.download
+        download: data.download,
+        fileName: data.fileName.split('.')[0],
+        expire: moment(data.expire).format('DD/MM/YYYY HH:mm:ss')
       }
     })
   }
 
-  async sendReceivedFile(data: {from: string, email: string, expire: Date, download: string}): Promise<void> {
+  async sendReceivedFile(data: {from: string, email: string, expire: Date, download: string, fileName: string}): Promise<void> {
     await this.mailer.sendMail({
       to: data.email,
       from: this.config.get<string>('SMTP_USER'),
@@ -49,7 +37,23 @@ export class AppService {
         name: data.email.split('@')[0],
         from: data.from,
         expire: moment(data.expire).format('DD/MM/YYYY HH:mm:ss'),
-        download: data.download
+        download: data.download,
+        fileName: data.fileName.split('.')[0],
+      }
+    });
+  }
+
+  async sendConfirmFileDownloaded(data: {email: string, author: string, fileName: string}): Promise<void> {
+    await this.mailer.sendMail({
+      to: data.email,
+      from: this.config.get<string>('SMTP_USER'),
+      subject: 'File downloaded ✔',
+      template: 'confirm-download',
+      context: {
+        name: data.author.split('@')[0],
+        fileName: data.fileName.split('.')[0],
+        email: data.email,
+        date: moment().format('DD/MM/YYYY HH:mm:ss')
       }
     });
   }

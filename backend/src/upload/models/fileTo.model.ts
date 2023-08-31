@@ -1,4 +1,4 @@
-import {Table, Model, Column, PrimaryKey, AutoIncrement, ForeignKey, Default, DataType} from 'sequelize-typescript';
+import {Table, Model, Column, PrimaryKey, AutoIncrement, ForeignKey, Default, DataType, BelongsTo} from 'sequelize-typescript';
 import {File} from './file.model';
 import { nanoid } from 'nanoid';
 
@@ -22,4 +22,7 @@ export class FileTo extends Model {
     @Default(() => nanoid(10))
     @Column
     token: string
+
+    @BelongsTo(() => File)
+    file: File
 }

@@ -12,14 +12,17 @@ export class AppController {
   }
 
   @EventPattern('confirm_upload')
-  async confirmUpload(@Payload() data: {email: string, target: string[], download: string}) {
-    console.log(data);
+  async confirmUpload(@Payload() data: {email: string, target: string[], download: string, fileName: string, expire: Date}) {
     await this.appService.sendConfirmFileSent(data);
   }
 
   @EventPattern('notify')
-  async notify(@Payload() data: {from: string, email: string, expire: Date, download: string}) {
-    console.log(data);
+  async notify(@Payload() data: {from: string, email: string, expire: Date, download: string, fileName: string}) {
     await this.appService.sendReceivedFile(data);
+  }
+
+  @EventPattern('file_downloaded')
+  async confirmDownload(@Payload() data: {email: string, author: string, fileName: string}) {
+    await this.appService.sendConfirmFileDownloaded(data);
   }
 }

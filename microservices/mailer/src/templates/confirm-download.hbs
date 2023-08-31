@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirm files sent</title>
+    <title>Confirm download</title>
 </head>
 <body>
     <style>
@@ -11,7 +11,6 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            color: #222;
         }
 
         h1 {
@@ -35,39 +34,13 @@
             height: 2px; 
             background-color: #E5E7EB; 
         }
-
-        .file_info {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: flex-start;
-            padding-top: 1.5rem;
-            padding-bottom: 1.5rem;
-        }
     </style>
-    <h1>Confirm files sent</h1>
-    <h3>Hi {{name}},</h3>
-    <p>Thank you for sending your files. We will get back to you as soon as possible.</p>
 
+    <h1>Confirm {{fileName}} downloaded</h1>
+    <h3>Hi, {{name}}</h3>
     <div class="divider"></div>
 
-    <h3>You file sent at:</h3>
-    <ul>
-        {{#each target}}
-            <li><a href='mailto:{{this}}'>{{this}}</a></li>
-        {{/each}}
-    </ul>
-
-    <div class="divider"></div>
-
-    <p>Link to download your file: </p>
-    <a href='{{download}}'>{{download}}</a>
-    
-    <div class="file_info">
-        <span>File Name: {{fileName}}.</span>
-        <br />
-        <span>Expiration date: {{expire}}.</span>
-    </div>
+    <p>Your file ({{fileName}}) has been successfully downloaded by {{email}} at {{date}}</p>
 
     <p>Regards,</p>
     <p>Team</p>

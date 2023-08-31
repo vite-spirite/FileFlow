@@ -11,6 +11,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
+            color: #222;
         }
 
         h1 {
@@ -34,6 +35,14 @@
             height: 2px; 
             background-color: #E5E7EB; 
         }
+        .file_info {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding-top: 1.5rem;
+            padding-bottom: 1.5rem;
+        }
     </style>
     <h1>You have received file</h1>
     <h3>Hi {{name}},</h3>
@@ -44,7 +53,11 @@
     <p>Link to download your file: </p>
     <a href='{{download}}'>{{download}}</a>
 
-    <p>Expiration: {{expire}}</p>
+    <div class="file_info">
+        <span>File Name: {{fileName}}.</span>
+        <br />
+        <span>Expiration date: {{expire}}.</span>
+    </div>
 
     <p>Regards,</p>
     <p>Team</p>
