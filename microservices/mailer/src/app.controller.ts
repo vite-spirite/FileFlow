@@ -7,7 +7,8 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @EventPattern('test')
-  getHello(@Payload() data: any): void {
+  async getHello(@Payload() data: any): Promise<void> {
     console.log(data);
+    await this.appService.sendMail();
   }
 }
