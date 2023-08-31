@@ -39,8 +39,6 @@ export class UploadService {
             files: files,
             id: file.id
         });
-
-        this.client.emit('test', {text: 'test'});
     }
 
     async completeZipFiles(result: {fileName: string, id: number}) {
@@ -56,8 +54,17 @@ export class UploadService {
         file.isEncrypted = true;
         await file.save();
 
-        console.log(`http://localhost:3000/upload/${result.fileName}/${result.key}/${result.iv}`);
         //send email to user with link to download file with password and iv in microservice
+
+        const fileTos = await this.fileToModel.findAll({where: {fileId: result.id}});
+        const targets = fileTos.map((fileTo) => fileTo.email);
+        const download = `http://localhost:3000/upload/${result.fileName}/${result.key}/${result.iv}` 
+
+        targets.forEach((target) => {
+            this.client.emit('notify', {from: file.from, email: target, expire: file.deletedAt, download: download});
+        });
+
+        this.client.emit('confirm_upload', {email: file.from, target: targets, download: download});
     }
 
     downloadFile(file: string, key: string, iv: string) {
