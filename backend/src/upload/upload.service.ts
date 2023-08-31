@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
@@ -8,6 +8,7 @@ import { CreateFileDto } from './dto/create-file.dto';
 import { createReadStream, readFileSync } from 'fs';
 import { createDecipheriv } from 'crypto';
 import jszip from 'jszip';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class UploadService {
@@ -16,6 +17,7 @@ export class UploadService {
         @InjectModel(FileTo) private fileToModel: typeof FileTo,
         @InjectQueue('zipper') private zipperQueue: Queue,
         @InjectQueue('encryption') private encryptionQueue: Queue,
+        @Inject('MAILER_SERVICE') private client: ClientProxy,
     ) {}
 
     async create(files: Express.Multer.File[], data: CreateFileDto) {
@@ -37,6 +39,8 @@ export class UploadService {
             files: files,
             id: file.id
         });
+
+        this.client.emit('test', {text: 'test'});
     }
 
     async completeZipFiles(result: {fileName: string, id: number}) {
