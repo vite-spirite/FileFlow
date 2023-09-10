@@ -60,7 +60,6 @@ export class UploadService {
 
     async completeZipFiles(result: {fileName: string, id: number}) {
         const {fileName, id} = result;
-        console.log('completeZipFiles', fileName);
 
         this.encryptionQueue.add("encrypt", result);
     }
@@ -73,7 +72,7 @@ export class UploadService {
 
         const fileTos = await this.fileToModel.findAll({where: {fileId: result.id}});
         const targets = fileTos.map((fileTo) => fileTo.email);
-        const download = `${this.config.get<string>('APP_URL')}/${result.fileName}/` 
+        const download = `${this.config.get<string>('APP_URL')}upload/${result.fileName}/` 
 
         fileTos.forEach(async (target) => {
             const token = this.jwtService.sign({code: target.token, key: result.key, iv: result.iv});
@@ -116,9 +115,8 @@ export class UploadService {
 
     @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
     async deleteExpiredFile() {
-        console.log('deleteExpiredFile');
         const files = await this.fileModel.findAll({where: {deletedAt: {[Op.lt]: new Date()}}, include: {all: true}});
-        console.log(files);
+        
         files.forEach(async (file) => {
             if(file.isEncrypted) {
                 rmSync('./uploads/encryption/'+file.fileName);

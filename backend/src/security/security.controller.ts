@@ -7,7 +7,6 @@ export class SecurityController {
 
   @Post('/')
   async createToken(@Body() options: {email: string}) {
-    console.log(options);
     return this.securityService.createToken(options.email);
   }
 }

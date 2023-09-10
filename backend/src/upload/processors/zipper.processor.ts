@@ -16,8 +16,7 @@ export class ZipperProcessor {
 
     @Process('zipper')
     async zipper(job: Job<{files: Express.Multer.File[], id: number}>) {
-        console.log("Start")
-        const {files} = job.data;
+        const files = job.data.files;
 
         const zip = JSZip();
 
@@ -33,12 +32,10 @@ export class ZipperProcessor {
         mkdirSync('./uploads/zipper', {recursive: true});
         writeFileSync('./uploads/zipper/'+zipName, content);
 
-
         files.forEach(file => {
             rmSync(file.path);
         });
 
-        console.log("Done");
         return {fileName: zipName, id: job.data.id};
     }
 

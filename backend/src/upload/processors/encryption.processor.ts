@@ -18,7 +18,6 @@ export class EncryptionProcessor {
 
         const cipher = createCipheriv('aes-256-ctr', key, iv);
         const file = readFileSync('./uploads/zipper/'+job.data.fileName);
-        console.log(nanoid(12));
 
         const encrypted = Buffer.concat([cipher.update(file), cipher.final()]);
 
