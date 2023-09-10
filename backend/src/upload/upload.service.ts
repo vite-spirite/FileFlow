@@ -5,12 +5,14 @@ import { Queue } from 'bull';
 import { FileTo } from './models/fileTo.model';
 import { File } from './models/file.model';
 import { CreateFileDto } from './dto/create-file.dto';
-import { createReadStream, readFileSync } from 'fs';
+import { createReadStream, readFileSync, rmSync } from 'fs';
 import { createDecipheriv } from 'crypto';
 import { ClientProxy } from '@nestjs/microservices';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { SecurityService } from 'src/security/security.service';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class UploadService {
@@ -110,5 +112,39 @@ export class UploadService {
         const decrypt = stream.pipe(decipher);
 
         return decrypt;
+    }
+
+    @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+    async deleteExpiredFile() {
+        console.log('deleteExpiredFile');
+        const files = await this.fileModel.findAll({where: {deletedAt: {[Op.lt]: new Date()}}, include: {all: true}});
+        console.log(files);
+        files.forEach(async (file) => {
+            if(file.isEncrypted) {
+                rmSync('./uploads/encryption/'+file.fileName);
+            }
+
+            await file.to.forEach(async (fileTo) => {
+                await fileTo.destroy();
+            });
+
+            await file.destroy();
+        });
+    }
+
+    @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+    async deleteZipperCompletedTask() {
+        const zipper = await this.zipperQueue.getCompleted();
+        zipper.forEach(async (job) => {
+            await job.remove();
+        });
+    }
+
+    @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+    async deleteEncryptionCompletedTask() {
+        const encryption = await this.encryptionQueue.getCompleted();
+        encryption.forEach(async (job) => {
+            await job.remove();
+        });
     }
 }

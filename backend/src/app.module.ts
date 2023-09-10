@@ -6,6 +6,7 @@ import { UploadModule } from './upload/upload.module';
 import { BullModule } from '@nestjs/bull';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SecurityModule } from './security/security.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { SecurityModule } from './security/security.module';
       })
     }),
     UploadModule,
-    SecurityModule
+    SecurityModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],
