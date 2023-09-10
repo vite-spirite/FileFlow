@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
@@ -10,6 +10,7 @@ import { createDecipheriv } from 'crypto';
 import { ClientProxy } from '@nestjs/microservices';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { SecurityService } from 'src/security/security.service';
 
 @Injectable()
 export class UploadService {
@@ -19,29 +20,40 @@ export class UploadService {
         @InjectQueue('zipper') private zipperQueue: Queue,
         @InjectQueue('encryption') private encryptionQueue: Queue,
         @Inject('MAILER_SERVICE') private client: ClientProxy,
+        private SecurityService: SecurityService,
         private jwtService: JwtService,
         private config: ConfigService
     ) {}
 
     async create(files: Express.Multer.File[], data: CreateFileDto) {
-        const file = await this.fileModel.create({
-            fileName: '',
-            from: data.from,
-            isEncrypted: false,
-            deletedAt: new Date(new Date().setDate(new Date().getDate() + 7)),
-        });
 
-        data.to.forEach(async (to) => {
-            await this.fileToModel.create({
-                fileId: file.id,
-                email: to
+        try {
+            const credentials = await this.SecurityService.useToken(data.token);
+
+            const file = await this.fileModel.create({
+                fileName: '',
+                from: credentials.email,
+                isEncrypted: false,
+                deletedAt: new Date(new Date().setDate(new Date().getDate() + 7)),
             });
-        });
+    
+            data.to.forEach(async (to) => {
+                await this.fileToModel.create({
+                    fileId: file.id,
+                    email: to
+                });
+            });
+    
+            this.zipperQueue.add("zipper", {
+                files: files,
+                id: file.id
+            });
 
-        this.zipperQueue.add("zipper", {
-            files: files,
-            id: file.id
-        });
+            return true;
+        }
+        catch(e) {
+            return new BadRequestException(e);
+        }
     }
 
     async completeZipFiles(result: {fileName: string, id: number}) {

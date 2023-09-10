@@ -10,6 +10,7 @@ import { FileTo } from './models/fileTo.model';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { SecurityModule } from 'src/security/security.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       })
     }),
     ConfigModule,
+    SecurityModule
   ],
   controllers: [UploadController],
   providers: [UploadService, ZipperProcessor, EncryptionProcessor],

@@ -26,8 +26,7 @@ export class UploadController {
     })
   )
   async uploadFile(@UploadedFiles() files, @Body() options: CreateFileDto) {
-    await this.uploadService.create(files, options);
-    console.log(files);
+    return await this.uploadService.create(files, options);
   }
 
   @Get(':file/:token')

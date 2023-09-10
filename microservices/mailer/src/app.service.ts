@@ -57,4 +57,17 @@ export class AppService {
       }
     });
   }
+
+  async sendSecurityToken(data: {email: string, token: string}): Promise<void> {
+    await this.mailer.sendMail({
+      to: data.email,
+      from: this.config.get<string>('SMTP_USER'),
+      subject: 'Security token ✔',
+      template: 'security-token',
+      context: {
+        name: data.email.split('@')[0],
+        token: data.token
+      }
+    });
+  }
 }

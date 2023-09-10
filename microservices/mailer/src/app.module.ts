@@ -28,7 +28,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
             strict: true,
           }
         },
-        preview: false
+        preview: true
       })
     }),
   ],

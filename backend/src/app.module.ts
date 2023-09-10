@@ -5,6 +5,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { UploadModule } from './upload/upload.module';
 import { BullModule } from '@nestjs/bull';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { SecurityModule } from './security/security.module';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         },
       })
     }),
-    UploadModule
+    UploadModule,
+    SecurityModule
   ],
   controllers: [AppController],
   providers: [AppService],

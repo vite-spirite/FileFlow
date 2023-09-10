@@ -28,6 +28,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/microservices": "^10.2.3",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/schedule": "^3.0.3",
     "@nestjs/sequelize": "^10.0.0",
     "amqp-connection-manager": "^4.1.14",
     "amqplib": "^0.10.3",

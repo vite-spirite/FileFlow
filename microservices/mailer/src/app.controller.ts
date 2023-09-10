@@ -25,4 +25,9 @@ export class AppController {
   async confirmDownload(@Payload() data: {email: string, author: string, fileName: string}) {
     await this.appService.sendConfirmFileDownloaded(data);
   }
+
+  @EventPattern('send_token')
+  async sendToken(@Payload() data: {email: string, token: string}) {
+    await this.appService.sendSecurityToken(data);
+  }
 }
