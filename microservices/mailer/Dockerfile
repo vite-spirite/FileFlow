@@ -1,11 +1,11 @@
 FROM node:20.4.0-slim
-RUN apt-get update -y && apt-get install -y openssl build-essential libpq-dev sqlite3
+RUN apt-get update -y && apt-get install -y openssl build-essential libpq-dev
 
 RUN mkdir -p /app
 WORKDIR /app
 
 COPY package*.json /app
-RUN npm i sqlite3 -D &&  rm -rf node_modules && npm i && npm rebuild
+RUN npm install
 
 COPY . /app
 RUN npm i -g @nestjs/cli

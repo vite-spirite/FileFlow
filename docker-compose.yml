@@ -11,6 +11,16 @@ services:
       - ./backend:/app
     networks:
       - FileFlow
+  mailer:
+    build: ./microservices/mailer
+    container_name: mailer
+    restart: always
+    volumes:
+      - ./microservices/mailer:/app
+    networks:
+      - FileFlow
+    depends_on:
+      - backend
   redis:
     image: redis:alpine
     container_name: redis
