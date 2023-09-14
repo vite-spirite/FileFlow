@@ -1,0 +1,76 @@
+---
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+import Layout from '../layouts/Layout.astro';
+import FeatureCard from '../components/feature.astro';
+let features: CollectionEntry<'features'> = await getCollection('features');
+features.sort((a, b) => +a.id - +b.id);
+
+let step = 0;
+---
+
+<script>
+	let step = +document.querySelectorAll('.tab')[0].getAttribute('step');
+
+	document.querySelectorAll('.tab__item').forEach((item, index) => {
+		item.addEventListener('click', () => {
+			step = index+1;
+			alert(step);
+		});
+	});
+</script>
+
+<Layout title="Welcome to Astro.">
+	<main class="flex flex-col lg:flex-row justify-center items-center w-full">
+		<section class="lg:h-screen lg:overflow-auto !w-full max-w-none prose bg-gradient-to-b from-amber-500 to-orange-500 p-6 lg:px-32 flex flex-col space-y-32 lg:space-y-64 pb-16 lg:pb-0">
+			<h1>FileFlow</h1>
+
+			<article class="prose-xl lg:w-1/2">
+				<h3>Essayez-le dès maintenant et découvrez le partage de fichiers comme vous ne l'avez jamais vu ! 🚀</h3>
+			</article>
+		</section>
+		<section class="lg:h-screen lg:overflow-auto !w-full max-w-none prose bg-gradient-to-b from-cyan-500 to-blue-500 p-6 lg:px-32">
+			<h1>Fonctionnalitées:</h1>
+
+			{features.map((feature, index) => (
+				<FeatureCard {...feature} reverse={index % 2 == 1}/>
+			))}
+		</section>
+	</main>
+</Layout>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:global(html) {
+	font-family: 'Inter', sans-serif;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+	.tab__item {
+		@apply cursor-pointer hidden;
+	}
+
+	.tab__item--active {
+		@apply block;
+	}
+
+	.tab__indicator {
+		@apply flex justify-center items-center;
+	}
+
+	.tab__indicator__item {
+		@apply w-2 h-2 rounded-full bg-gray-300 mx-1;
+	}
+
+	.tab__indicator__item--active {
+		@apply bg-white;
+	}
+	
+}
+</style>

@@ -1,8 +1,8 @@
-import { OnQueueActive, OnQueueCompleted, Process, Processor } from "@nestjs/bull";
+import { OnQueueCompleted, Process, Processor } from "@nestjs/bull";
 import { Job } from "bull";
 import { UploadService } from "../upload.service";
 import * as JSZip from "jszip";
-import { mkdir, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from "fs";
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { customAlphabet } from "nanoid";
 
 @Processor('zipper')

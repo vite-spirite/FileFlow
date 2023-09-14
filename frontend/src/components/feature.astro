@@ -1,0 +1,18 @@
+---
+import type {CollectionEntry} from 'astro:content';
+
+type Props = CollectionEntry<'features'> & {reverse?: boolean}
+
+const {data, body, reverse} = Astro.props;
+---
+
+<article class={`feature flex justify-center items-center p-6 w-full prose max-w-none ${reverse ? 'flex-row-reverse' : 'flex-row'}`}>
+    <div class={`image flex flex-col justify-end items-center ${!reverse ? 'pr-5' : 'pr-0'}`}>
+        <img src={data.image} alt={data.title} class="w-full rounded-full block w-96 lg:w-48"/>
+        <span class="text-xs block"><a class="text-neutral-600" href={data.imageCopyLink}>{data.imageCopyText}</a> {data.imageCopyAfter}</span>
+    </div>
+    <div class={`text flex flex-col justify-start items-start ${reverse ? 'pr-5' : 'pr-0'}`}>
+        <h2 class="text-neutral-900 !pt-0 !mt-0">{data.title}</h2>
+        <p class="text-neutral-800">{body}</p>
+    </div>
+</article>
