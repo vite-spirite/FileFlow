@@ -2,6 +2,10 @@
 
 FileFlow is a secure and user-friendly platform for sending and receiving large files with ease. Whether you need to share high-resolution photos, videos, or important documents, FileFlow provides a reliable solution for hassle-free file transfers.
 
+## Preview
+
+![Preview](./preview.png)
+
 ## Features
 
 - **Fast and Reliable:** Transfer large files quickly and securely without the limitations of traditional email attachments.
