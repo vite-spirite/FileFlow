@@ -1,14 +1,20 @@
 ---
 import { getCollection } from 'astro:content';
 
-import Layout from '../layouts/Layout.astro';
-import FeatureCard from '../components/feature.astro';
-import Upload from '../components/upload.vue';
+import Layout from '../../../../layouts/Layout.astro';
+import FeatureCard from '../../../../components/feature.astro';
+import Download from '../../../../components/download.vue';
 
 let features = await getCollection('features');
 features.sort((a, b) => +a.id - +b.id);
 
-export const prerender = true;
+const {file, key} = Astro.params;
+
+if(!file || !key) {
+	return Astro.redirect('/');
+}
+
+export const prerender = false;
 ---
 
 <Layout title="Welcome to Astro.">
@@ -20,9 +26,7 @@ export const prerender = true;
 				<h3>Essayez-le dès maintenant et découvrez le partage de fichiers comme vous ne l'avez jamais vu ! 🚀</h3>
 			</article>
 
-			<div>
-				<Upload client:load />
-			</div>
+			<Download file={file} token={key} client:load/>
 		</section>
 		<section class="lg:h-screen lg:overflow-auto !w-full max-w-none prose bg-gradient-to-b from-cyan-500 to-blue-500 p-6 lg:px-32">
 			<h1>Fonctionnalitées:</h1>
