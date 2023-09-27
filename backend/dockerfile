@@ -5,10 +5,11 @@ RUN mkdir -p /app
 WORKDIR /app
 
 COPY package*.json /app
-RUN npm i sqlite3 -D &&  rm -rf node_modules && npm i && npm rebuild
+RUN npm i sqlite3 &&  rm -rf node_modules && npm i && npm rebuild
 
 COPY . /app
 RUN npm i -g @nestjs/cli
 RUN npm run build
 
 CMD ["npm", "run", "start:prod"]
+expose 3000

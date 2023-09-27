@@ -11,11 +11,19 @@ import { ScheduleModule } from '@nestjs/schedule';
 @Module({
   imports: [
     ConfigModule.forRoot({isGlobal: true}),
-    SequelizeModule.forRoot({
-      dialect: 'sqlite',
-      storage: 'database.sqlite',
-      synchronize: true,
-      autoLoadModels: true,
+    SequelizeModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        dialect: 'mysql',
+        host: config.get<string>('MYSQL_HOST'),
+        port: config.get<number>('MYSQL_PORT'),
+        username: config.get<string>('MYSQL_USER'),
+        password: config.get<string>('MYSQL_PASSWORD'),
+        database: config.get<string>('MYSQL_DATABASE'),
+        synchronize: true,
+        autoLoadModels: true,
+      })
     }),
     BullModule.forRootAsync({
       imports: [ConfigModule],

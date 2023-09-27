@@ -45,7 +45,7 @@ export class AppService {
 
   async sendConfirmFileDownloaded(data: {email: string, author: string, fileName: string}): Promise<void> {
     await this.mailer.sendMail({
-      to: data.email,
+      to: data.author,
       from: this.config.get<string>('SMTP_USER'),
       subject: 'File downloaded ✔',
       template: 'confirm-download',

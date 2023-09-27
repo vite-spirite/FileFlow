@@ -7,8 +7,6 @@ import Upload from '../components/upload.vue';
 
 let features = await getCollection('features');
 features.sort((a, b) => +a.id - +b.id);
-
-export const prerender = true;
 ---
 
 <Layout title="Welcome to Astro.">

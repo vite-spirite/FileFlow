@@ -72,7 +72,7 @@ export class UploadService {
 
         const fileTos = await this.fileToModel.findAll({where: {fileId: result.id}});
         const targets = fileTos.map((fileTo) => fileTo.email);
-        const download = `${this.config.get<string>('APP_URL')}upload/${result.fileName}/` 
+        const download = `${this.config.get<string>('APP_DOWLOAD_URL')}/${result.fileName}/` 
 
         fileTos.forEach(async (target) => {
             const token = this.jwtService.sign({code: target.token, key: result.key, iv: result.iv});

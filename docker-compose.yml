@@ -1,6 +1,19 @@
 version: '3.5'
 
 services:
+  db:
+    image: mysql
+    container_name: db
+    restart: always
+    ports:
+      - 3306:3306
+    networks:
+      - FileFlow
+    volumes:
+      - mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: fileflow
   backend:
     build: ./backend
     container_name: backend
@@ -53,3 +66,4 @@ networks:
 
 volumes:
   redis:
+  mysql:

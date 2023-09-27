@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^1.0.3",
+    "@astrojs/node": "^6.0.1",
     "@astrojs/tailwind": "^5.0.0",
     "@astrojs/vue": "^3.0.0",
     "@vueuse/core": "^10.4.1",
